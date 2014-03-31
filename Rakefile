@@ -15,6 +15,8 @@ desc "Builds the ads into the dist/ folder.\n\nProtip: use space-dilimeted strin
 task :build, [:types, :sizes] do |t, args|
   args.with_defaults types: AdBuilder::TYPES, sizes: AdBuilder::SIZES
 
+  Rake::Task["cleanup"].invoke
+
   Rake::Task["server:start"].invoke
   sleep 1
 
@@ -26,6 +28,12 @@ task :build, [:types, :sizes] do |t, args|
   ensure
     Rake::Task["server:stop"].invoke
   end
+end
+
+desc "Removes all generated content from the dist/ folder."
+task :cleanup do
+  folders = AdBuilder::TYPES.map {|t| "dist/#{t}" }
+  `rm -rf #{folders.join(' ')}`
 end
 
 # Splits a space-delimited string into an array if it's a string.
