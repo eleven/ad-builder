@@ -52,9 +52,9 @@ Each template loads in their corresponding stylesheet and script file (e.g. the 
 
 ##### Custom-built jQuery
 
-We're using a custom-built jQuery to save KBs. For reference, here are the flags we're currently building jQuery against:
+We're using a custom-built version of jQuery v1.11.0 to save KBs. For reference, here are the flags we're currently building jQuery against:
 
-    -ajax,-deprecated,-event,-offset,-wrap,-core/ready,-exports/amd
+    -ajax,-deprecated,-event,-offset,-wrap,-core/ready,-exports/amd,-dimensions
 
 _[Go here](https://github.com/jquery/jquery#how-to-build-your-own-jquery) to read more about building a custom version of jQuery._
 
