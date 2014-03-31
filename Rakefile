@@ -1,6 +1,8 @@
 require "rubygems"
 require "bundler/setup"
 require "rakeup"
+require "yui/compressor"
+require "uglifier"
 
 require "./ad_builder"
 
@@ -17,6 +19,7 @@ task :build, [:types, :sizes] do |t, args|
 
   Rake::Task["cleanup"].invoke
 
+  # Boot up the server in production mode
   Rake::Task["server:start"].invoke
   sleep 1
 
@@ -44,6 +47,8 @@ end
 
 # Builds multiple ads with types and sizes.
 def build_ads(types, sizes)
+  # Enable compression
+
   types.each do |type|
     sizes.each do |size|
       build_ad type, size
@@ -81,6 +86,9 @@ end
 # Compiles an asset from the asset pipeline
 def compile_asset(src, dest)
   sprockets = AdBuilder.settings.sprockets
+  sprockets.css_compressor = YUI::CssCompressor.new
+  sprockets.js_compressor = Uglifier.new(mangle: true, comments: :none)
+
   asset = sprockets[src]
   FileUtils.mkdir_p Pathname.new(dest).dirname
 

@@ -1,6 +1,10 @@
 source "https://rubygems.org"
 
 gem "sinatra"
-gem "sprockets"
 gem "thin"
 gem "rakeup"
+gem "sprockets"
+
+# Asset compression
+gem "yui-compressor"
+gem "uglifier"
