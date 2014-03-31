@@ -1,5 +1,17 @@
 require "sinatra/base"
 require "sprockets"
+require "fastimage"
+
+module Sinatra
+  module AssetHelpers
+    def image_src(src)
+      size = FastImage.size("src/assets/images/#{src.gsub(/\/?assets\//, '')}")
+      "src=\"#{src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
+    end
+  end
+
+  helpers AssetHelpers
+end
 
 class AdBuilder < Sinatra::Application
   TYPES = ["general", "discovery", "leadership", "passion", "service", "general_alt", "leadership_alt", "passion_alt"]
