@@ -10,7 +10,7 @@ Make sure you have all dependencies installed by running:
 
 Development consists of using Sinatra and Sprockets for building files. Simply boot up the server by running:
 
-    rackup
+    rake server
 
 And then navigating to http://localhost:9292/TYPE/SIZE where `TYPE` is any of these:
 
