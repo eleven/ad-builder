@@ -5,7 +5,7 @@ require "fastimage"
 module Sinatra
   module AssetHelpers
     def image_src(src)
-      size = FastImage.size("src/assets/images/#{src.gsub(/\/?assets\//, '')}")
+      size = FastImage.size("#{File.dirname(__FILE__)}/src/assets/images/#{src.gsub(/\/?assets\//, '')}")
       "src=\"#{src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
     end
   end
