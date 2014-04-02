@@ -4,9 +4,11 @@ require "fastimage"
 
 module Sinatra
   module AssetHelpers
-    def image_src(src)
+    def image_src(src, lazy_load = true)
       size = FastImage.size("#{File.dirname(__FILE__)}/src/assets/images/#{src.gsub(/\/?assets\//, '')}")
-      "src=\"#{src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
+      image_src = if lazy_load then "assets/global_blank.gif" else src end
+      html = "src=\"#{image_src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
+      html = "#{html} data-lazyload-src=\"#{src}\"" if lazy_load
     end
   end
 
@@ -17,6 +19,7 @@ class AdBuilder < Sinatra::Application
   TYPES = ["general", "discovery", "leadership", "passion", "service", "general_alt", "leadership_alt", "passion_alt"]
   SIZES = ["160x600", "300x250", "300x600", "728x90"]
 
+  set :lazyload, true
   set :root, File.join(File.dirname(__FILE__), "src")
   set :views, Proc.new { File.join(root) }
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
