@@ -5,6 +5,9 @@ require "yui/compressor"
 require "uglifier"
 
 require "./ad_builder"
+include Sinatra::AssetHelpers
+
+ENV["RACK_ENV"] = "production"
 
 RakeUp::ServerTask.new do |t|
   t.port = 9292
@@ -63,22 +66,26 @@ def build_ad(type, size)
   print "Building #{type} #{size} ad..." if verbose == true
 
   dest_folder = "dist/#{type}/#{size}"
-  assets_folder = "#{dest_folder}/assets"
   css_file = "#{size}.css"
   js_file = "#{size}.js"
 
-  FileUtils.mkdir_p assets_folder
+  FileUtils.mkdir_p dest_folder
 
-  `curl -o #{dest_folder}/index.html http://localhost:9292/#{type}/#{size}`
+  `curl -o #{dest_folder}/index.html http://localhost:9292/banner/#{type}/#{size}`
 
   # Compile CSS and JS
-  compile_asset css_file, "#{assets_folder}/#{css_file}"
-  compile_asset js_file, "#{assets_folder}/#{js_file}"
+  compile_asset css_file, "#{dest_folder}/#{css_file}"
+  compile_asset js_file, "#{dest_folder}/#{js_file}"
 
   # Move images
-  `cp src/assets/images/global* #{assets_folder} 2>/dev/null`
-  `cp src/assets/images/#{size}* #{assets_folder} 2>/dev/null`
-  `cp src/assets/images/#{type}_#{size}* #{assets_folder} 2>/dev/null`
+  images = Dir.glob("src/assets/images/global*")
+             .concat(Dir.glob("src/assets/images/#{size}*"))
+             .concat(Dir.glob("src/assets/images/#{type}_#{size}*"))
+
+  images.each do |image|
+    filename = remove_image_prefix File.basename(image)
+    `cp #{image} #{dest_folder}/#{filename}`
+  end
 
   puts "done!" if verbose == true
 end

@@ -72,7 +72,7 @@ module Sinatra
     # 
     # Returns the String filename of the image without the prefix.
     def remove_image_prefix(filename)
-      filename.grep(/^(global|\d+x\d+|[a-zA-Z]+_\d+x\d+)_/, '')
+      filename.gsub(/^(global|\d+x\d+|[a-zA-Z]+_\d+x\d+)_/, '')
     end
   end
 
