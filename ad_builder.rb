@@ -3,18 +3,7 @@ require "sinatra/base"
 require "sprockets"
 require "fastimage"
 
-module Sinatra
-  module AssetHelpers
-    def image_src(src, lazy_load = true)
-      size = FastImage.size("#{File.dirname(__FILE__)}/src/assets/images/#{src.gsub(/\/?assets\//, '')}")
-      image_src = if lazy_load then "assets/global_blank.gif" else src end
-      html = "src=\"#{image_src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
-      html = "#{html} data-lazyload-src=\"#{src}\"" if lazy_load
-    end
-  end
-
-  helpers AssetHelpers
-end
+require "./lib/asset_helpers"
 
 class AdBuilder < Sinatra::Application
   set :lazyload, true
@@ -35,24 +24,24 @@ class AdBuilder < Sinatra::Application
 
   ##############################################################################
   # Routes
-  get "/:type/:size" do
+  get "/banner/:type/:size" do
     erb params[:size].to_sym, locals: { type: params[:type] }, layout: false
   end
 
   ##############################################################################
   # Assets
-  get "/:type/assets/:stylesheet.css" do
+  get "/assets/css/:stylesheet" do
     content_type "text/css"
-    settings.sprockets["#{params[:stylesheet]}.css"]
+    settings.sprockets["#{params[:stylesheet]}"]
   end
 
-  get "/:type/assets/:javascript.js" do
+  get "/assets/js/:javascript" do
     content_type "application/javascript"
-    settings.sprockets["#{params[:javascript]}.js"]
+    settings.sprockets["#{params[:javascript]}"]
   end
 
   %w{jpg png gif}.each do |format|
-    get "/:type/assets/:image.#{format}" do
+    get "/assets/images/:image.#{format}" do
       content_type "image/#{format}"
       settings.sprockets["#{params[:image]}.#{format}"]
     end
