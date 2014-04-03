@@ -1,3 +1,4 @@
+require "yaml"
 require "sinatra/base"
 require "sprockets"
 require "fastimage"
@@ -16,14 +17,15 @@ module Sinatra
 end
 
 class AdBuilder < Sinatra::Application
-  TYPES = ["general", "discovery", "leadership", "passion", "service", "general_alt", "leadership_alt", "passion_alt"]
-  SIZES = ["160x600", "300x250", "300x600", "728x90"]
-
   set :lazyload, true
   set :root, File.join(File.dirname(__FILE__), "src")
   set :views, Proc.new { File.join(root) }
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
   set :assets_path, File.join(root, "assets")
+  set :manifest, Proc.new { YAML.load_file File.join(root, 'manifest.yml') }
+
+  TYPES = manifest["types"]
+  SIZES = manifest["sizes"]
 
   configure do
     sprockets.append_path File.join(assets_path, "css")
