@@ -64,6 +64,14 @@ module Sinatra
       "#{options[:parent_folder]}#{file}"
     end
 
+    def banner_url(path)
+      if ENV["RACK_ENV"] == "production"
+        "#{path}/index.html"
+      else
+        "/banner/#{path}"
+      end
+    end
+
     private
 
     # Private: Removes the prefix from an image filename.

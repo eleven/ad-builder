@@ -50,7 +50,10 @@ end
 
 # Builds multiple ads with types and sizes.
 def build_ads(types, sizes)
-  # Enable compression
+
+  # Add the index
+  FileUtils.mkdir_p "dist/"
+  `curl -o dist/index.html http://localhost:9292/`
 
   types.each do |type|
     sizes.each do |size|

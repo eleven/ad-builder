@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Banners</title>
+
+  <style>
+    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; margin: 0; }
+    #nav { width: 180px; float: left; padding-left: 20px; padding-top: 20px; }
+    #frame { padding-left: 220px; padding-top: 20px; }
+    h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div id="nav">
+    <% manifest["types"].each do |type| %>
+      <h3><%= type %></h3>
+      <ul>
+        <% manifest["sizes"].each do |size| %>
+          <li><a href="<%= banner_url "#{type}/#{size}" %>"><%= size %></a></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+  <div id="frame">
+    Select a banner from the left.
+  </div>
+
+  <script type="text/javascript">
+    var nav = document.getElementById("nav"),
+        frame = document.getElementById("frame"),
+        setFrame = function (node) {
+          var iframe = document.createElement("iframe"),
+              type = node.parentNode.parentNode.previousElementSibling.innerHTML,
+              size = node.innerHTML,
+              dimensions = size.split('x');
+          iframe.src = node.href;
+          iframe.width = dimensions[0];
+          iframe.height = dimensions[1];
+          iframe.scrolling = "no";
+
+          iframe.style.border = "none";
+
+          frame.innerHTML = "<h3>" + type + " - " + size + " <small><a href=\"" + node.href + "\">No frames</a></small></h3>";
+          frame.appendChild(iframe);
+        },
+        onNavClick = function (e) {
+          if (e.target.nodeName === "A") {
+            e.preventDefault();
+            setFrame(e.target);
+          }
+        };
+
+    nav.addEventListener('click', onNavClick, false);
+  </script>
+</body>
+</html>
