@@ -66,15 +66,15 @@ All of the images must be placed into `src/assets/images`. Each image must follo
     300x250_foo_bar.jpg
     general_300x250_foo_bar.jpg
 
-### global images
+##### global images
 
 Images prefixed with `global_` will be included into EVERY ad. Make sure you only give this prefix to the images that MUST be in EVERY ad, or else you're wasting precious KBs.
 
-### size images
+##### size images
 
 Images prefixed with a size (e.g. `300x250_`) will be included into **every ad that has that size**. For example, if you had 3 versions of the 300x250 ad, they would all get that image. Use this if the image will be in every variation of the specific size ad.
 
-### type and size images
+##### type and size images
 
 Images prefixed with first a type (e.g. `general_`) _and then_ a size (e.g. `300x250_`) will be included into the single ad that has that type and the size. Use this if the image will not be in every variation of the specific size ad.
 
