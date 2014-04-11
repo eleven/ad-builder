@@ -10,9 +10,9 @@ Make sure you have all dependencies installed by running:
 
 Development consists of using Sinatra and Sprockets for building files. Simply boot up the server by running:
 
-    rake server
+    rackup
 
-And then navigating to http://localhost:9292/TYPE/SIZE where `TYPE` is any of these:
+And then navigating to http://localhost:9292/banner/TYPE/SIZE where `TYPE` is any of these:
 
 * general
 * discovery
@@ -30,7 +30,7 @@ and `SIZE` is any of these:
 * 300x600
 * 728x90
 
-For example, if you wanted to see the general version of the 300x250 ad, you would go to http://localhost:9292/general/300x250.
+For example, if you wanted to see the general version of the 300x250 ad, you would go to http://localhost:9292/banner/general/300x250.
 
 #### The src folder
 
