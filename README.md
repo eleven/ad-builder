@@ -1,4 +1,4 @@
-This is the repo for the Retail Ad Builder. This project programatically builds out ads via `rake build`.
+This is the repo for the Ad Builder. This project programatically builds out ads via `rake build`.
 
 ## Getting started
 
@@ -12,7 +12,7 @@ Development consists of using Sinatra and Sprockets for building files. Simply b
 
     rackup
 
-And then navigating to http://localhost:9292/banner/TYPE/SIZE where `TYPE` is any of these:
+And then navigating to http://localhost:9292/PROJECT/TYPE/SIZE where `project` is your project directory's name, `TYPE` is any of these:
 
 * general
 * discovery
@@ -30,109 +30,140 @@ and `SIZE` is any of these:
 * 300x600
 * 728x90
 
-For example, if you wanted to see the general version of the 300x250 ad, you would go to http://localhost:9292/banner/general/300x250.
+For example, if you wanted to see the general version of the 300x250 ad from within your `my-banners` project, you would go to http://localhost:9292/my-banners/general/300x250.
 
-#### The src folder
+## The src folder
 
-All development happens within the `src` folder. Templates live in this folder and assets live in the `src/assets` folder.
+All development happens within the `src` folder, which isn't tracked by this git repo. Ad Builder assumes a lot of things in your `src` folder:
 
-#### Scripts and Stylesheets
+* Each project is a subdirectory (e.g. `src/my-banners/`)
+* Each project contains a `manifest.yml` file.
+* Each project contains a template for each size (e.g. `src/my-banners/300x250.erb`)
+* Each project contains a directory for assets (e.g. `src/my-banners/assets/`) with three folders:
+    * `css/` - for your stylesheets
+    * `js/` - for your scripts
+    * `images/` - for your images
 
-All css files must be placed into `src/assets/css` and all js files must be placed into `src/assets/js`.
+### manifest.yml
+
+Each project must have a file named `manifest.yml`. This file contains a list of each of the project's types and sizes. Here's an example manifest file:
+
+```yml
+types:
+  - earth
+  - wind
+  - water
+  - fire
+sizes:
+  - 160x600
+  - 300x250
+  - 300x600
+  - 728x90
+```
+
+When the Ad Builder parses this file, it assumes that you have N sizes for each type, so in the above example you would have these banners:
+
+    earth - 160x600
+    earth - 300x250
+    earth - 300x600
+    earth - 728x90
+    wind - 160x600
+    ... etc ...
+
+### Templates
+
+Each size has a template with a name of `SIZE.erb` where `SIZE` is any of the sizes listed in your `manifest.yml` file. Each template has access to these variables:
+
+* `type` - the type of the template currently being viewed.
+* `project` - the name of the project
+
+Each template also has access to [these helpers][asset-helpers].
+
+### Assets
+
+Each project must have their assets (css, js, images, etc) placed into a folder named `assets/`. The directory must have these folders:
 
     assets/
-      css/
-        base.css
-        SIZE.css
-      js/
-        base.js
-        SIZE.js
+        css/
+        images/
+        js/
 
-Each template loads in their corresponding stylesheet and script file (e.g. the "300x250" template would load "300x250.js" and "300x250.css"). Each stylesheet and script file loads in their "base" version that is applied to all templates. Any shared code would exist there, while the template-specific code would exist within the template file.
+#### Sprockets
 
-##### Custom-built jQuery
+We're using [sprockets][sprockets-homepage] to serve assets. When the server is booted up, Ad Builder looks for the directories above and includes it into sprockets' load path. Since we're using sprockets, you can `require` files into your .css and .js files. [Go here to read more about how to do that.][sprockets-dependencies].
 
-We're using a custom-built version of jQuery v1.11.0 to save KBs. For reference, here are the flags we're currently building jQuery against:
+[asset-helpers]: https://github.com/eleven/ad-builder/blob/master/lib/asset_helpers.rb
+[sprockets-homepage]: https://github.com/sstephenson/sprockets
+[sprockets-dependencies]: https://github.com/sstephenson/sprockets#managing-and-bundling-dependencies
 
-    -ajax,-deprecated,-event/alias,-offset,-wrap,-core/ready,-exports/amd,-dimensions
+#### Images
 
-_[Go here](https://github.com/jquery/jquery#how-to-build-your-own-jquery) to read more about building a custom version of jQuery._
+All of the images must be placed into your project's `assets/images` folder. Each image must not be in a subdirectory of this folder and they must follow a special naming convention or they won't be exported with the banner. There are three ways you can name an image:
 
-#### Image naming conventions
+* for all banners - `global_foo_bar.jpg`
+    * Images prefixed with `global_` will be included with EVERY banner in the project.
+* for a specific size - `300x250_foo_bar.jpg`
+    * Images prefixed with `SIZE_` will be included with every banner that is the specified size.
+* for a specific type and size - `general_300x250_foo_bar.jpg`
+    * Images prefixed with `TYPE_SIZE_` will be included only with the banner that is the specified size and the specified type.
 
-All of the images must be placed into `src/assets/images`. Each image must follow a special naming convention or they won't be included via the build script. There are three ways you can name an image:
+## Rake Tasks
 
-    global_foo_bar.jpg
-    300x250_foo_bar.jpg
-    general_300x250_foo_bar.jpg
+Ad Builder comes with a handful of Rake tasks by default. If a rake command specified below has an argument prepended with an asterisk, that means that the argument is optional.
 
-##### global images
+### rake new[project_name,*types,*sizes]
 
-Images prefixed with `global_` will be included into EVERY ad. Make sure you only give this prefix to the images that MUST be in EVERY ad, or else you're wasting precious KBs.
+Scaffolds a new project in the `src` directory.
 
-##### size images
+Arguments:
 
-Images prefixed with a size (e.g. `300x250_`) will be included into **every ad that has that size**. For example, if you had 3 versions of the 300x250 ad, they would all get that image. Use this if the image will be in every variation of the specific size ad.
+* `project_name` - the name of the project. This will be the directory's name.
+* `types` - (optional) a space-delimited string of types to support (e.g. "typeA typeB typeC"). **Default:** no types.
+* `sizes` - (optional) a space-delimited string of sizes in the format `WxH` to create templates for (e.g. "300x250 160x600"). **Default:** no sizes.
 
-##### type and size images
+#### Example
 
-Images prefixed with first a type (e.g. `general_`) _and then_ a size (e.g. `300x250_`) will be included into the single ad that has that type and the size. Use this if the image will not be in every variation of the specific size ad.
+Running the command:
 
+    $ rake new["my-banners","general alt","300x250 160x600"]
 
-### Building for handoff
+Will scaffold a new project named `my-banners` with the types `general` and `alt` in the sizes of `300x250` and `160x600`. It will create a working project with a manifest, CSS and JS files and templates that include helpers and variables to give you an example of how a project is structured.
 
-To build all of the ads, simply run `rake build`. If you only need to build specific ads, you can run the rake command with arguments.
+If you run `rake new` with only the project name, then _no_ banner templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
 
-    rake build[types,sizes]
+### rake export[*projects,*types,*sizes,include_index]
 
-Where "types" would be a _space-delimited_ string of types (e.g. "general discovery leadership") and "sizes" would be a _space-delimited_ string of sizes (e.g. "300x250 728x90").
+Exports banners into the `dist/` folder. Each banner will be placed into a directory following this pattern: `dist/PROJECT/TYPE/SIZE/'. Each banner's assets will be placed into the banner directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
 
-Running the build task will start the server, gather the assets and place them in the `dist` folder, and then kill the server. After the task has been completed, you can zip up the `dist` folder and put it wherever you'd like.
+Arguments:
 
-## Optimization techniques
+* `projects` - (optional) A space-delimited string of project names to export banners for (e.g. "my-banners clientA clientB"). **Default:** all projects.
+* `types` - (optional) A space-delimited string of types to export (e.g. "typeA typeB typeC"). **Default:** all of a projects' types.
+* `sizes` - (optional) A space-delimited string of sizes to export (e.g. "160x600 300x250"). **Default:** all of a project's sizes.
 
-### Styles
+If no arguments are passed, this task will export _all_ projects' banners by default.
 
-CSS should be clear and concise. You should not have any rules that are unused. You can check for unused styles by running the "Audit" feature found in Chrome's Developer Tools. Try to combine rules if possible to retain wasted bytes.
+#### Example
 
-### JS
+Running the command
 
-JS should be clear and concise. Try not to use external libraries at all if possible. Try to leverage recursive functions whenever possible to reduce byte-size.
+    $ rake export
 
-### Images
+Will result in each banner will be placed into a folder named after its project.
 
-All images with transparency, text, and/or hard edges that need to be sharp should be PNG. All other images should be JPEG. When working in Photoshop, make sure to save the image by using the **File > Save for Web** dialog.
+    dist/
+        my-banners/
+            typeA/
+                300x250/
+                    index.html
+                    image.jpg
+                    styles.css
+                    scripts.js
+                ...
+            ...
+        clientA/
+           ...
+        clientB/
+           ...
 
-#### JPEG
-
-JPEG is a **lossy** image format, which means that the image data is lost during compression. The more compression used, the lower the quality. Lower quality images tend to have "artifacts" and blurry edges, making it unsuitable for text. For most images, you should be using these Save for Web settings:
-
-* Quality: 60
-* Blur: 0
-* Optimized: yes
-
-If the image quality is poorer than usual, try increasing the quality incrementally to 80, 90 or 100. Do note that the image may have been compressed previously if you are re-editing a JPEG. The bottom-line target you should be aiming for is a low file size. Smaller images can typically get away with the higher qualities. ~20KB is a typical target to aim for.
-
-#### PNG
-
-PNG is a **lossless** image format, which means that the original image's quality is retained after compression. PNG is optimal for images that have only a few colors or have an emphasis on sharp edges (e.g. text, buttons). PNG also supports transparency. PNG files can be saved into two formats: PNG-8 and PNG-24.
-
-Due to the nature of how PNG works, PNG can be incredibly efficient for some use cases and terribly inefficient for others. If used properly, a PNG can be much more efficient than an equivalent JPEG version.
-
-##### PNG-8
-
-PNG-8 is the "more efficient" version of PNG. PNG-8 is similar to GIF. It only supports up to 256 colors, so use this format for simple images like text. PNG-8 also supports transparency, but only one alpha channel, so that means that you either get 100% opacity or 0% opacity, no in-between. All partially transparent pixels will have a "matte" color saved behind it, so make sure to match the matte with the background color the image will be on top of. Also, like GIF, when you have an image with a transparency, then the transparent "color" takes up one of the 256 colors; matted transparent pixels will each take up a color as well (think of a 50% black pixel on top of a white background as a 50% gray pixel).
-
-##### PNG-24
-
-PNG-24 is what most people refer to as simply PNG. PNG-24 supports full alpha transparency, meaning you can a truly transparent image. The tradeoff is a much larger file size on some images. On other images, it can be the same size as a PNG-8 or slightly larger.
-
-##### Optimizing for PNG
-
-Despite being lossless, PNG includes compression. PNG uses a lossless compression method known as DEFLATE, which essentially "simplifies" the image's data by predicting what the colors will be. Since PNG arranges its data from left-to-right, you can optimize your images for PNG by reducing the amount of colors used adjacently on a row of pixels. An image with alternating horizontal stripes will be much smaller than a similarly-sized image with alternating vertical stripes. Also, wider images tend to be smaller than taller ones.
-
-Knowing when to properly use PNG or JPG will go a long way in keeping file sizes down.
-
-#### Sprites
-
-File sizes and requests can be cut down by combining images into sprites. If your sprite is going to be a PNG, make sure your images are laid out horizontally rather than vertically whenever possible. JPEG is usually not a very good candidate for sprites since sprites rely on hard edges and JPEG cannot provide that.
+From here, you can easily hand off your exported banners.

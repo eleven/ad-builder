@@ -11,15 +11,24 @@ class AdBuilder < Sinatra::Application
   set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "views")]
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
   set :assets_path, File.join(root, "assets")
-  set :manifest, Proc.new { YAML.load_file File.join(root, 'manifest.yml') }
+  set :projects, lambda { Dir["#{root}/*/"].map { |d| File.basename(d) } }
 
-  TYPES = manifest["types"]
-  SIZES = manifest["sizes"]
+  def manifest(project)
+    if @manifest[project]
+      @manifest[project]
+    else
+      if Dir.exists? File.join(root, project)
+        @manifest[project] = YAML.load_file File.join(root, project, 'manifest.yml')
+      end
+    end
+  end
 
   configure do
-    sprockets.append_path File.join(assets_path, "css")
-    sprockets.append_path File.join(assets_path, "js")
-    sprockets.append_path File.join(assets_path, "images")
+    Dir.glob("#{root}/*/").each do |project_folder|
+      sprockets.append_path File.join(project_folder, 'assets', 'css')
+      sprockets.append_path File.join(project_folder, 'assets', 'js')
+      sprockets.append_path File.join(project_folder, 'assets', 'images')
+    end
   end
 
   helpers do
@@ -30,16 +39,9 @@ class AdBuilder < Sinatra::Application
 
   ##############################################################################
   # Routes
-
-  get "/" do
-    erb :index, locals: { manifest: settings.manifest }, layout: false
-  end
-
-  get "/banner/:type/:size" do
-    erb params[:size].to_sym, locals: { type: params[:type] }, layout: false
-  end
-
   ##############################################################################
+
+  # ============================================================================
   # Assets
 
   get "/assets/css/:stylesheet" do
@@ -58,4 +60,22 @@ class AdBuilder < Sinatra::Application
       settings.sprockets["#{params[:image]}.#{format}"]
     end
   end
+
+  # ============================================================================
+  # Projects
+
+  # Create route handlers for each project
+  projects.each do |project|
+    get "/#{project}" do
+      set_project(project)
+      erb :index, locals: { manifest: manifest(project) }, layout: false
+    end
+
+    get "/#{project}/:type/:size" do
+      set_project(project)
+      erb "#{project}/#{params[:size]}".to_sym, locals: { type: params[:type], project: project }, layout: false
+    end
+  end
+
+  
 end

@@ -1,5 +1,14 @@
 module Sinatra
   module AssetHelpers
+    # Sets the project.
+    # 
+    # project - the String project name to be set.
+    #
+    # Returns the String project name.
+    def set_project(project)
+      @project = project
+    end
+
     # Public: Creates image src, width and height attributes by an image src.
     # 
     # image - The String image filename.
@@ -20,7 +29,7 @@ module Sinatra
         trim_prefixes: ENV["RACK_ENV"] == "production"
       }.merge(opts)
 
-      size = FastImage.size("#{File.dirname(__FILE__)}/../src/assets/images/#{image}")
+      size = FastImage.size("#{File.dirname(__FILE__)}/../src/#{@project}/assets/images/#{image}")
       image_src = if options[:lazy_load] then "global_blank.gif" else image end
 
       if options[:trim_prefixes]
