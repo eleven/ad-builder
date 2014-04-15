@@ -16,8 +16,8 @@ RakeUp::ServerTask.new do |t|
   t.server = :thin
 end
 
-desc "Builds the ads into the dist/ folder.\n\nProtip: use space-dilimeted string(s) for multiple types/sizes. Example:\n  rake build[\"general discovery\", \"300x600 728x90\"]\n\nDefault types: #{AdBuilder::TYPES}\nDefault sizes: #{AdBuilder::SIZES}"
-task :build, [:types, :sizes] do |t, args|
+desc "Exports the ads into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake build[\"general discovery\", \"300x600 728x90\"]\n\nDefault types: #{AdBuilder::TYPES}\nDefault sizes: #{AdBuilder::SIZES}"
+task :export, [:types, :sizes] do |t, args|
   args.with_defaults types: AdBuilder::TYPES, sizes: AdBuilder::SIZES
 
   Rake::Task["cleanup"].invoke
