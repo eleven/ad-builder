@@ -1,4 +1,6 @@
-This is the repo for the Ad Builder. This project programatically builds out ads via `rake build`.
+# Ad Builder
+
+Ad Builder helps you make your HTML5 ads, quickly. Do you enjoy managing 30 variations of a ad? Do you enjoy having to manually compress your files? Do you enjoy creating your own manifest files? I didn't think so. Ad Builder solves all of those problems. By using ruby to do all of the heavy lifting, you can make ads without breaking a sweat.
 
 ## Getting started
 
