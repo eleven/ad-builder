@@ -169,3 +169,7 @@ Will result in each banner will be placed into a folder named after its project.
            ...
 
 From here, you can easily hand off your exported banners.
+
+[asset-helpers]: https://github.com/eleven/ad-builder/blob/master/lib/asset_helpers.rb
+[sprockets-homepage]: https://github.com/sstephenson/sprockets
+[sprockets-dependencies]: https://github.com/sstephenson/sprockets#managing-and-bundling-dependencies
