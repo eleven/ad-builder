@@ -29,7 +29,7 @@ module Sinatra
         trim_prefixes: ENV["RACK_ENV"] == "production"
       }.merge(opts)
 
-      size = FastImage.size("#{File.dirname(__FILE__)}/../src/#{@project}/assets/images/#{image}")
+      size = FastImage.size("#{File.dirname(__FILE__)}/../../src/#{@project}/assets/images/#{image}")
       image_src = if options[:lazy_load] then "global_blank.gif" else image end
 
       if options[:trim_prefixes]

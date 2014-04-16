@@ -1,27 +1,16 @@
 require "yaml"
-require "sinatra/base"
 require "sprockets"
 require "fastimage"
 
-require "./lib/asset_helpers"
+require_relative "lib/ad_builder"
 
-class AdBuilder < Sinatra::Application
+class AdBuilderServer < AdBuilder::Server
   set :lazyload, true
   set :root, File.join(File.dirname(__FILE__), "src")
   set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "views")]
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
   set :assets_path, File.join(root, "assets")
   set :projects, lambda { Dir["#{root}/*/"].map { |d| File.basename(d) } }
-
-  def manifest(project)
-    if @manifest[project]
-      @manifest[project]
-    else
-      if Dir.exists? File.join(root, project)
-        @manifest[project] = YAML.load_file File.join(root, project, 'manifest.yml')
-      end
-    end
-  end
 
   configure do
     Dir.glob("#{root}/*/").each do |project_folder|
@@ -32,6 +21,7 @@ class AdBuilder < Sinatra::Application
   end
 
   helpers do
+    # Allows us to load views from multiple folders
     def find_template(views, name, engine, &block)
       Array(views).each { |v| super(v, name, engine, &block) }
     end
@@ -68,7 +58,7 @@ class AdBuilder < Sinatra::Application
   projects.each do |project|
     get "/#{project}" do
       set_project(project)
-      erb :index, locals: { manifest: manifest(project) }, layout: false
+      erb :index, locals: { manifest: manifest(project, root) }, layout: false
     end
 
     get "/#{project}/:type/:size" do
@@ -76,6 +66,4 @@ class AdBuilder < Sinatra::Application
       erb "#{project}/#{params[:size]}".to_sym, locals: { type: params[:type], project: project }, layout: false
     end
   end
-
-  
 end

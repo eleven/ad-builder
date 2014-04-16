@@ -1,2 +1,2 @@
 require "./ad_builder"
-run AdBuilder
+run AdBuilderServer

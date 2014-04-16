@@ -1,14 +1,12 @@
 require "rubygems"
 require "bundler/setup"
 require "rakeup"
-require "yui/compressor"
-require "uglifier"
 
-require "./ad_builder"
-include Sinatra::AssetHelpers
 
-ENV["RACK_ENV"] = "production"
+src_folder = File.join File.dirname(__FILE__), "src"
+dist_folder = File.join File.dirname(__FILE__), "dist"
 
+# Add server tasks
 RakeUp::ServerTask.new do |t|
   t.port = 9292
   t.pid_file = "tmp/server.pid"
@@ -16,18 +14,28 @@ RakeUp::ServerTask.new do |t|
   t.server = :thin
 end
 
-desc "Exports the ads into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake build[\"general discovery\", \"300x600 728x90\"]\n\nDefault types: #{AdBuilder::TYPES}\nDefault sizes: #{AdBuilder::SIZES}"
-task :export, [:types, :sizes] do |t, args|
-  args.with_defaults types: AdBuilder::TYPES, sizes: AdBuilder::SIZES
+# Splits a space-delimited string into an array if it's a string.
+def rake_array_arg(arg, delim = " ")
+  return arg.split(delim) if arg.is_a? String
+  return arg
+end
+
+desc "Exports the ads into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake build[\"general discovery\", \"300x600 728x90\"]"
+task :export, [:projects, :types, :sizes, :include_indexes] do |t, args|
+  args.with_defaults projects: nil, types: nil, sizes: nil, include_indexes: true
+
+  require_relative "ad_builder"
+  require_relative "lib/ad_builder/exporter"
 
   Rake::Task["cleanup"].invoke
 
-  # Boot up the server in production mode
+  ENV["RACK_ENV"] = "production"
   Rake::Task["server:start"].invoke
   sleep 1
 
   begin
-    build_ads rake_array_arg(args.types), rake_array_arg(args.sizes)
+    exporter = AdBuilder::Exporter.new src_folder, dist_folder, AdBuilderServer, include_indexes: args.include_indexes, verbose: verbose
+    exporter.build_projects rake_array_arg(args.projects), rake_array_arg(args.types), rake_array_arg(args.sizes)
   rescue Exception => e
     puts e.message
     puts e.backtrace
@@ -38,69 +46,5 @@ end
 
 desc "Removes all generated content from the dist/ folder."
 task :cleanup do
-  folders = AdBuilder::TYPES.map {|t| "dist/#{t}" }
-  `rm -rf #{folders.join(' ')}`
-end
-
-# Splits a space-delimited string into an array if it's a string.
-def rake_array_arg(arg, delim = " ")
-  return arg.split(delim) if arg.is_a? String
-  return arg
-end
-
-# Builds multiple ads with types and sizes.
-def build_ads(types, sizes)
-
-  # Add the index
-  FileUtils.mkdir_p "dist/"
-  `curl -o dist/index.html http://localhost:9292/`
-
-  types.each do |type|
-    sizes.each do |size|
-      build_ad type, size
-    end
-  end
-end
-
-# Builds an ad by type and size.
-# 
-# NOTE: This method requires some sensible defaults.
-def build_ad(type, size)
-  print "Building #{type} #{size} ad..." if verbose == true
-
-  dest_folder = "dist/#{type}/#{size}"
-  css_file = "#{size}.css"
-  js_file = "#{size}.js"
-
-  FileUtils.mkdir_p dest_folder
-
-  `curl -o #{dest_folder}/index.html http://localhost:9292/banner/#{type}/#{size}`
-
-  # Compile CSS and JS
-  compile_asset css_file, "#{dest_folder}/#{css_file}"
-  compile_asset js_file, "#{dest_folder}/#{js_file}"
-
-  # Move images
-  images = Dir.glob("src/assets/images/global*")
-             .concat(Dir.glob("src/assets/images/#{size}*"))
-             .concat(Dir.glob("src/assets/images/#{type}_#{size}*"))
-
-  images.each do |image|
-    filename = remove_image_prefix File.basename(image)
-    `cp #{image} #{dest_folder}/#{filename}`
-  end
-
-  puts "done!" if verbose == true
-end
-
-# Compiles an asset from the asset pipeline
-def compile_asset(src, dest)
-  sprockets = AdBuilder.settings.sprockets
-  sprockets.css_compressor = YUI::CssCompressor.new
-  sprockets.js_compressor = Uglifier.new(mangle: true, comments: :none)
-
-  asset = sprockets[src]
-  FileUtils.mkdir_p Pathname.new(dest).dirname
-
-  asset.write_to dest
+  `rm -rf #{dist_folder}`
 end
