@@ -32,16 +32,16 @@ and `SIZE` is any of these:
 * 300x600
 * 728x90
 
-For example, if you wanted to see the general version of the 300x250 ad from within your `my-banners` project, you would go to http://localhost:9292/my-banners/general/300x250.
+For example, if you wanted to see the general version of the 300x250 ad from within your `my-ads` project, you would go to http://localhost:9292/my-ads/general/300x250.
 
 ## The src folder
 
 All development happens within the `src` folder, which isn't tracked by this git repo. Ad Builder assumes a lot of things in your `src` folder:
 
-* Each project is a subdirectory (e.g. `src/my-banners/`)
+* Each project is a subdirectory (e.g. `src/my-ads/`)
 * Each project contains a `manifest.yml` file.
-* Each project contains a template for each size (e.g. `src/my-banners/300x250.erb`)
-* Each project contains a directory for assets (e.g. `src/my-banners/assets/`) with three folders:
+* Each project contains a template for each size (e.g. `src/my-ads/300x250.erb`)
+* Each project contains a directory for assets (e.g. `src/my-ads/assets/`) with three folders:
     * `css/` - for your stylesheets
     * `js/` - for your scripts
     * `images/` - for your images
@@ -63,7 +63,7 @@ sizes:
   - 728x90
 ```
 
-When the Ad Builder parses this file, it assumes that you have N sizes for each type, so in the above example you would have these banners:
+When the Ad Builder parses this file, it assumes that you have N sizes for each type, so in the above example you would have these ads:
 
     earth - 160x600
     earth - 300x250
@@ -94,20 +94,16 @@ Each project must have their assets (css, js, images, etc) placed into a folder 
 
 We're using [sprockets][sprockets-homepage] to serve assets. When the server is booted up, Ad Builder looks for the directories above and includes it into sprockets' load path. Since we're using sprockets, you can `require` files into your .css and .js files. [Go here to read more about how to do that.][sprockets-dependencies].
 
-[asset-helpers]: https://github.com/eleven/ad-builder/blob/master/lib/asset_helpers.rb
-[sprockets-homepage]: https://github.com/sstephenson/sprockets
-[sprockets-dependencies]: https://github.com/sstephenson/sprockets#managing-and-bundling-dependencies
-
 #### Images
 
-All of the images must be placed into your project's `assets/images` folder. Each image must not be in a subdirectory of this folder and they must follow a special naming convention or they won't be exported with the banner. There are three ways you can name an image:
+All of the images must be placed into your project's `assets/images` folder. Each image must not be in a subdirectory of this folder and they must follow a special naming convention or they won't be exported with the ad. There are three ways you can name an image:
 
-* for all banners - `global_foo_bar.jpg`
-    * Images prefixed with `global_` will be included with EVERY banner in the project.
+* for all ads - `global_foo_bar.jpg`
+    * Images prefixed with `global_` will be included with EVERY ad in the project.
 * for a specific size - `300x250_foo_bar.jpg`
-    * Images prefixed with `SIZE_` will be included with every banner that is the specified size.
+    * Images prefixed with `SIZE_` will be included with every ad that is the specified size.
 * for a specific type and size - `general_300x250_foo_bar.jpg`
-    * Images prefixed with `TYPE_SIZE_` will be included only with the banner that is the specified size and the specified type.
+    * Images prefixed with `TYPE_SIZE_` will be included only with the ad that is the specified size and the specified type.
 
 ## Rake Tasks
 
@@ -127,23 +123,23 @@ Arguments:
 
 Running the command:
 
-    $ rake new["my-banners","general alt","300x250 160x600"]
+    $ rake new["my-ads","general alt","300x250 160x600"]
 
-Will scaffold a new project named `my-banners` with the types `general` and `alt` in the sizes of `300x250` and `160x600`. It will create a working project with a manifest, CSS and JS files and templates that include helpers and variables to give you an example of how a project is structured.
+Will scaffold a new project named `my-ads` with the types `general` and `alt` in the sizes of `300x250` and `160x600`. It will create a working project with a manifest, CSS and JS files and templates that include helpers and variables to give you an example of how a project is structured.
 
-If you run `rake new` with only the project name, then _no_ banner templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
+If you run `rake new` with only the project name, then _no_ ad templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
 
 ### rake export[*projects,*types,*sizes,include_index]
 
-Exports banners into the `dist/` folder. Each banner will be placed into a directory following this pattern: `dist/PROJECT/TYPE/SIZE/'. Each banner's assets will be placed into the banner directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
+Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/PROJECT/TYPE/SIZE/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
 
 Arguments:
 
-* `projects` - (optional) A space-delimited string of project names to export banners for (e.g. "my-banners clientA clientB"). **Default:** all projects.
+* `projects` - (optional) A space-delimited string of project names to export ads for (e.g. "my-ads clientA clientB"). **Default:** all projects.
 * `types` - (optional) A space-delimited string of types to export (e.g. "typeA typeB typeC"). **Default:** all of a projects' types.
 * `sizes` - (optional) A space-delimited string of sizes to export (e.g. "160x600 300x250"). **Default:** all of a project's sizes.
 
-If no arguments are passed, this task will export _all_ projects' banners by default.
+If no arguments are passed, this task will export _all_ projects' ads by default.
 
 #### Example
 
@@ -151,10 +147,10 @@ Running the command
 
     $ rake export
 
-Will result in each banner will be placed into a folder named after its project.
+Will result in each ad will be placed into a folder named after its project.
 
     dist/
-        my-banners/
+        my-ads/
             typeA/
                 300x250/
                     index.html
@@ -168,7 +164,7 @@ Will result in each banner will be placed into a folder named after its project.
         clientB/
            ...
 
-From here, you can easily hand off your exported banners.
+From here, you can easily hand off your exported ads.
 
 [asset-helpers]: https://github.com/eleven/ad-builder/blob/master/lib/asset_helpers.rb
 [sprockets-homepage]: https://github.com/sstephenson/sprockets
