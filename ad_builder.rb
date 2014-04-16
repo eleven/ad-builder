@@ -7,7 +7,7 @@ require_relative "lib/ad_builder"
 class AdBuilderServer < AdBuilder::Server
   set :lazyload, true
   set :root, File.join(File.dirname(__FILE__), "src")
-  set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "views")]
+  set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "sinatra", "views")]
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
   set :assets_path, File.join(root, "assets")
   set :projects, lambda { Dir["#{root}/*/"].map { |d| File.basename(d) } }
@@ -58,7 +58,7 @@ class AdBuilderServer < AdBuilder::Server
   projects.each do |project|
     get "/#{project}" do
       set_project(project)
-      erb :index, locals: { manifest: manifest(project, root) }, layout: false
+      erb :index, locals: { project: project, manifest: manifest(project, File.join(File.dirname(__FILE__), "src")) }, layout: false
     end
 
     get "/#{project}/:type/:size" do

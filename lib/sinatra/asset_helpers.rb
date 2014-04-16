@@ -73,11 +73,12 @@ module Sinatra
       "#{options[:parent_folder]}#{file}"
     end
 
-    def banner_url(path)
+    def banner_url(project, type, size)
+      path = "#{type}/#{size}"
       if ENV["RACK_ENV"] == "production"
         "#{path}/index.html"
       else
-        "/banner/#{path}"
+        "/#{project}/#{path}"
       end
     end
 
