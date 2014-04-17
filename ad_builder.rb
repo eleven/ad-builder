@@ -5,19 +5,25 @@ require "fastimage"
 require_relative "lib/ad_builder"
 
 class AdBuilderServer < AdBuilder::Server
-  set :lazyload, true
-  set :root, File.join(File.dirname(__FILE__), "src")
+  set :project, ENV["ADBUILDER_PROJECT"]
+  set :root, File.join(File.dirname(__FILE__), "src", project)
+  set :core_assets, File.join(File.dirname(__FILE__), "lib", "ad_builder", "assets")
+
   set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "sinatra", "views")]
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
-  set :assets_path, File.join(root, "assets")
-  set :projects, lambda { Dir["#{root}/*/"].map { |d| File.basename(d) } }
+
+  set :manifest, lambda { YAML.load_file File.join(root, 'manifest.yml') }
 
   configure do
-    Dir.glob("#{root}/*/").each do |project_folder|
-      sprockets.append_path File.join(project_folder, 'assets', 'css')
-      sprockets.append_path File.join(project_folder, 'assets', 'js')
-      sprockets.append_path File.join(project_folder, 'assets', 'images')
+    # Load in global assets
+    Dir["#{core_assets}/*/"].each do |core_asset_dir|
+      sprockets.append_path core_asset_dir
     end
+
+    # Load in the project's assets
+    sprockets.append_path File.join(root, 'assets', 'css')
+    sprockets.append_path File.join(root, 'assets', 'js')
+    sprockets.append_path File.join(root, 'assets', 'images')
   end
 
   helpers do
@@ -55,15 +61,11 @@ class AdBuilderServer < AdBuilder::Server
   # Projects
 
   # Create route handlers for each project
-  projects.each do |project|
-    get "/#{project}" do
-      set_project(project)
-      erb :index, locals: { project: project, manifest: manifest(project, File.join(File.dirname(__FILE__), "src")) }, layout: false
-    end
+  get "/" do
+    erb :index, locals: { manifest: settings.manifest }, layout: false
+  end
 
-    get "/#{project}/:type/:size" do
-      set_project(project)
-      erb "#{project}/#{params[:size]}".to_sym, locals: { type: params[:type], project: project }, layout: false
-    end
+  get "/:type/:size" do
+    erb params[:size].to_sym, locals: { type: params[:type] }, layout: false
   end
 end

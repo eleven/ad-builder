@@ -1,14 +1,5 @@
 module Sinatra
   module AssetHelpers
-    # Sets the project.
-    # 
-    # project - the String project name to be set.
-    #
-    # Returns the String project name.
-    def set_project(project)
-      @project = project
-    end
-
     # Public: Creates image src, width and height attributes by an image src.
     # 
     # image - The String image filename.
@@ -29,7 +20,8 @@ module Sinatra
         trim_prefixes: ENV["RACK_ENV"] == "production"
       }.merge(opts)
 
-      size = FastImage.size("#{File.dirname(__FILE__)}/../../src/#{@project}/assets/images/#{image}")
+      image_path = File.join(settings.root, 'assets', 'images', image)
+      size = FastImage.size image_path
       image_src = if options[:lazy_load] then "global_blank.gif" else image end
 
       if options[:trim_prefixes]
@@ -39,6 +31,7 @@ module Sinatra
 
       html = "src=\"#{options[:parent_folder]}#{image_src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
       html = "#{html} data-lazyload-src=\"#{options[:parent_folder]}#{image}\"" if options[:lazy_load]
+      html
     end
     
     # Public: Builds a path to a JS file. 
@@ -73,12 +66,12 @@ module Sinatra
       "#{options[:parent_folder]}#{file}"
     end
 
-    def banner_url(project, type, size)
+    def banner_url(type, size)
       path = "#{type}/#{size}"
       if ENV["RACK_ENV"] == "production"
         "#{path}/index.html"
       else
-        "/#{project}/#{path}"
+        "#{path}"
       end
     end
 

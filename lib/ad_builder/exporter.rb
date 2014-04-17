@@ -2,14 +2,12 @@ require "sprockets"
 require "yui/compressor"
 require "uglifier"
 
-require_relative "manifest_reader"
 require_relative "../sinatra/asset_helpers"
 
 module AdBuilder
   class Exporter
     attr_accessor :src_folder, :dist_folder, :sprockets
 
-    include AdBuilder::ManifestReader
     include Sinatra::AssetHelpers
 
     def initialize(src_folder, dist_folder, server, options = {})
@@ -19,20 +17,14 @@ module AdBuilder
       @options = options.merge include_indexes: true, verbose: false
     end
 
-    def build_projects(projects, types, sizes)
-      unless projects
-        projects = Dir["#{@src_folder}/*/"].map { |d| File.basename(d) }
-      end
-
-      projects.each do |project|
-        build_banners project, types, sizes
-      end
+    def export_project(project, types, sizes)
+      export_banners project, types, sizes
     end
 
-    def build_banners(project, types, sizes)
+    def export_banners(project, types, sizes)
       if Dir["#{@src_folder}/#{project}/"]
         unless types || sizes
-          mani = manifest(project, @src_folder)
+          mani = @server.settings.manifest
 
           types = mani["types"] if types.nil?
           sizes = mani["sizes"] if sizes.nil?
@@ -43,19 +35,19 @@ module AdBuilder
 
         # Download the index
         if @options[:include_indexes]
-          `curl -o #{@dist_folder}/#{project}/index.html http://localhost:9292/#{project}`
+          `curl -o #{@dist_folder}/#{project}/index.html http://localhost:9292/`
         end
 
         # Build each banner
         types.each do |type|
           sizes.each do |size|
-            build_banner project, type, size
+            export_banner project, type, size
           end
         end
       end
     end
 
-    def build_banner(project, type, size)
+    def export_banner(project, type, size)
       print "Building #{type} #{size} ad..." if @options[:verbose] == true
 
       banner_folder = "#{@dist_folder}/#{project}/#{type}/#{size}"
@@ -66,7 +58,7 @@ module AdBuilder
       FileUtils.mkdir_p banner_folder
 
       # Download the banner's html
-      `curl -o #{banner_folder}/index.html http://localhost:9292/#{project}/#{type}/#{size}`
+      `curl -o #{banner_folder}/index.html http://localhost:9292/#{type}/#{size}`
 
       # Compile CSS and JS
       compile_asset css_file, "#{banner_folder}/#{css_file}"

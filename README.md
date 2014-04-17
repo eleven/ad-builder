@@ -12,27 +12,9 @@ Make sure you have all dependencies installed by running:
 
 Development consists of using Sinatra and Sprockets for building files. Simply boot up the server by running:
 
-    rackup
+    ADBUILDER_PROJECT=<project name> rackup
 
-And then navigating to http://localhost:9292/PROJECT/TYPE/SIZE where `project` is your project directory's name, `TYPE` is any of these:
-
-* general
-* discovery
-* leadership
-* passion
-* service
-* general_alt
-* leadership_alt
-* passion_alt
-
-and `SIZE` is any of these:
-
-* 160x600
-* 300x250
-* 300x600
-* 728x90
-
-For example, if you wanted to see the general version of the 300x250 ad from within your `my-ads` project, you would go to http://localhost:9292/my-ads/general/300x250.
+The `<project name>` would be the your project directory that you'd like to load into the Ad Builder. Since Ad Builder only supports one project at a time, you'll have to reboot your server to switch projects.
 
 ## The src folder
 
@@ -48,7 +30,7 @@ All development happens within the `src` folder, which isn't tracked by this git
 
 ### manifest.yml
 
-Each project must have a file named `manifest.yml`. This file contains a list of each of the project's types and sizes. Here's an example manifest file:
+Each project must have a file named `manifest.yml`. This file contains a list of each of the project's `types` and `sizes`. Here's an example manifest file:
 
 ```yml
 types:
@@ -74,7 +56,7 @@ When the Ad Builder parses this file, it assumes that you have N sizes for each 
 
 ### Templates
 
-Each size has a template with a name of `SIZE.erb` where `SIZE` is any of the sizes listed in your `manifest.yml` file. Each template has access to these variables:
+Each size has a template with a name of `<size>.erb` where `<size>` is any of the sizes listed in your `manifest.yml` file. Each template has access to these variables:
 
 * `type` - the type of the template currently being viewed.
 * `project` - the name of the project
@@ -129,23 +111,21 @@ Will scaffold a new project named `my-ads` with the types `general` and `alt` in
 
 If you run `rake new` with only the project name, then _no_ ad templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
 
-### rake export[*projects,*types,*sizes,include_index]
+### rake export[project,*types,*sizes,include_index]
 
-Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/PROJECT/TYPE/SIZE/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
+Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/<project>/<type>/<size>/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
 
 Arguments:
 
-* `projects` - (optional) A space-delimited string of project names to export ads for (e.g. "my-ads clientA clientB"). **Default:** all projects.
-* `types` - (optional) A space-delimited string of types to export (e.g. "typeA typeB typeC"). **Default:** all of a projects' types.
+* `project` - The project you'd like to export ads for (e.g. "my-ads").
+* `types` - (optional) A space-delimited string of types to export (e.g. "typeA typeB typeC"). **Default:** all of a project's types.
 * `sizes` - (optional) A space-delimited string of sizes to export (e.g. "160x600 300x250"). **Default:** all of a project's sizes.
-
-If no arguments are passed, this task will export _all_ projects' ads by default.
 
 #### Example
 
 Running the command
 
-    $ rake export
+    $ rake export["my-ads"]
 
 Will result in each ad will be placed into a folder named after its project.
 
@@ -159,10 +139,6 @@ Will result in each ad will be placed into a folder named after its project.
                     scripts.js
                 ...
             ...
-        clientA/
-           ...
-        clientB/
-           ...
 
 From here, you can easily hand off your exported ads.
 

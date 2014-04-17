@@ -7,7 +7,7 @@ module AdBuilder
         @manifests[project]
       else
         if Dir.exists? File.join(root, project)
-          @manifests[project] = YAML.load_file File.join(root, project, 'manifest.yml')
+          @manifests[project] = 
         end
       end
     end

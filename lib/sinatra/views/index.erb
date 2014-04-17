@@ -16,7 +16,7 @@
       <h3><%= type %></h3>
       <ul>
         <% manifest["sizes"].each do |size| %>
-          <li><a href="<%= banner_url project, type, size %>"><%= size %></a></li>
+          <li><a href="<%= banner_url type, size %>"><%= size %></a></li>
         <% end %>
       </ul>
     <% end %>
