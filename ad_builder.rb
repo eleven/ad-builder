@@ -66,6 +66,8 @@ class AdBuilderServer < AdBuilder::Server
   end
 
   get "/:type/:size" do
-    erb params[:size].to_sym, locals: { type: params[:type] }, layout: false
+    set_banner_type params[:type]
+    set_banner_size params[:size]
+    erb params[:size].to_sym, locals: { type: params[:type], size: params[:size], manifest: settings.manifest }, layout: false
   end
 end
