@@ -1,3 +1,4 @@
+require "json"
 require "yaml"
 require "sprockets"
 require "fastimage"
@@ -31,6 +32,10 @@ class AdBuilderServer < AdBuilder::Server
     def find_template(views, name, engine, &block)
       Array(views).each { |v| super(v, name, engine, &block) }
     end
+
+    def local_get(url)
+      call(env.merge("PATH_INFO" => url)).last.join
+    end
   end
 
   ##############################################################################
@@ -58,6 +63,38 @@ class AdBuilderServer < AdBuilder::Server
   end
 
   # ============================================================================
+  # API
+
+  # Gets the images used on a template
+  get "/api/images/:type/:size.json" do
+    content_type :json
+
+    @rendered_images = []
+
+    # Extend the image_src method so that we can extract the images used in the template
+    def image_src(*args)
+      super do |src, lazyload_src|
+        @rendered_images.push(src)
+        @rendered_images.push(lazyload_src)
+      end
+    end
+
+    local_get("/#{params[:type]}/#{params[:size]}")
+
+    # "Reset" the image_src method
+    def image_src(*args)
+      super
+    end
+
+    { images: @rendered_images.uniq }.to_json
+  end
+
+  get "/api*" do
+    content_type :json
+    { error: "method not found" }.to_json
+  end
+
+  # ============================================================================
   # Projects
 
   # Create route handlers for each project
@@ -70,4 +107,5 @@ class AdBuilderServer < AdBuilder::Server
     set_banner_size params[:size]
     erb params[:size].to_sym, locals: { type: params[:type], size: params[:size], manifest: settings.manifest }, layout: false
   end
+
 end

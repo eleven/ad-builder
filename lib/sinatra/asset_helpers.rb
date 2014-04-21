@@ -37,6 +37,8 @@ module Sinatra
       size = FastImage.size image_path
       image_src = options[:lazy_load] ? "global_blank.gif" : image
 
+      yield image_src, image if block_given?
+
       if options[:trim_prefixes]
         image_src = remove_image_prefix(image_src)
         image = remove_image_prefix(image)

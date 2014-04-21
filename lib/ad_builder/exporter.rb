@@ -1,3 +1,5 @@
+require "json"
+require "open-uri"
 require "sprockets"
 require "yui/compressor"
 require "uglifier"
@@ -60,16 +62,15 @@ module AdBuilder
       # Download the banner's html
       `curl -o #{banner_folder}/index.html http://localhost:9292/#{type}/#{size}`
 
+
       # Compile CSS and JS
       compile_asset css_file, "#{banner_folder}/#{css_file}"
       compile_asset js_file, "#{banner_folder}/#{js_file}"
 
-      # Move images
-      images = Dir.glob("#{@src_folder}/#{project}/assets/images/global*")
-                 .concat(Dir.glob("#{@src_folder}/#{project}/assets/images/#{size}*"))
-                 .concat(Dir.glob("#{@src_folder}/#{project}/assets/images/#{type}_#{size}*"))
-
-      # Remove prefix from each image filename
+      # Fetch images used in this banner from the API and then move them into the folder
+      puts "http://localhost:9292/api/images/#{type}/#{size}.json"
+      images = JSON.load(open("http://localhost:9292/api/images/#{type}/#{size}.json"))["images"]
+      images.map! { |image| "#{@src_folder}/#{project}/assets/images/#{image}" }
       images.each do |image|
         trimmed_image_filename = remove_image_prefix File.basename(image)
         `cp #{image} #{banner_folder}/#{trimmed_image_filename}`
@@ -82,8 +83,6 @@ module AdBuilder
       sprockets = @server.settings.sprockets
       sprockets.css_compressor = YUI::CssCompressor.new
       sprockets.js_compressor = Uglifier.new mangle: true, comments: :none
-
-      puts src
 
       asset = sprockets[src]
       FileUtils.mkdir_p Pathname.new(destination).dirname
