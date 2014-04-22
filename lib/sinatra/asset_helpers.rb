@@ -50,7 +50,8 @@ module Sinatra
 
     def image_url(file, opts = {})
       options = {
-        parent_folder: ENV["RACK_ENV"] == "production" ? "" : "/assets/images/"
+        parent_folder: ENV["RACK_ENV"] == "production" ? "" : "/assets/images/",
+        trim_prefixes: ENV["RACK_ENV"] == "production"
       }.merge(opts)
 
       begin
@@ -59,11 +60,11 @@ module Sinatra
         raise FileNotFoundError.new("#{file} not recognized by Sprockets.")
       end
 
+      yield image if block_given?
+
       if options[:trim_prefixes]
         image = remove_image_prefix(image)
       end
-
-      yield image if block_given?
 
       "#{options[:parent_folder]}#{image}"
     end
