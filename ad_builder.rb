@@ -72,17 +72,16 @@ class AdBuilderServer < AdBuilder::Server
     @rendered_images = []
 
     # Extend the image_src method so that we can extract the images used in the template
-    def image_src(*args)
-      super do |src, lazyload_src|
-        @rendered_images.push(src)
-        @rendered_images.push(lazyload_src)
+    def image_url(*args)
+      super do |img|
+        @rendered_images.push(img)
       end
     end
 
     local_get("/#{params[:type]}/#{params[:size]}")
 
     # "Reset" the image_src method
-    def image_src(*args)
+    def image_url(*args)
       super
     end
 
@@ -105,7 +104,11 @@ class AdBuilderServer < AdBuilder::Server
   get "/:type/:size" do
     set_banner_type params[:type]
     set_banner_size params[:size]
-    erb params[:size].to_sym, locals: { type: params[:type], size: params[:size], manifest: settings.manifest }, layout: false
-  end
 
+    erb params[:size].to_sym, locals: {
+      type: params[:type],
+      size: params[:size],
+      manifest: settings.manifest
+    }, layout: false
+  end
 end

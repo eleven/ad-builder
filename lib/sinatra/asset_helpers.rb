@@ -2,6 +2,9 @@ module Sinatra
   module AssetHelpers
     attr_accessor :banner_type, :banner_size
 
+    class FileNotFoundError < StandardError
+    end
+
     def set_banner_type(type)
       @banner_type = type
     end
@@ -28,25 +31,41 @@ module Sinatra
     def image_src(src, opts = {})
       options = {
         lazy_load: true,
-        parent_folder: ENV["RACK_ENV"] == "production" ? "" : "/assets/images/",
-        trim_prefixes: ENV["RACK_ENV"] == "production"
+        parent_folder: ENV["RACK_ENV"] == "production" ? "" : "/assets/images/"
       }.merge(opts)
 
-      image_path = File.join settings.root, 'assets', 'images', File.basename(try_image(src))
-      image = File.basename image_path
-      size = FastImage.size image_path
-      image_src = options[:lazy_load] ? "global_blank.gif" : image
+      img_path = try_image(src)
+      img_url = image_url(src, options)
+      img_size = FastImage.size(img_path)
 
-      yield image_src, image if block_given?
+      if options[:lazy_load]
+        lazyload_url = img_url
+        img_url = image_url("blank.gif", options)
+      end
+
+      html = "src=\"#{img_url}\" width=\"#{img_size[0]}\" height=\"#{img_size[1]}\""
+      html = "#{html} data-lazyload-src=\"#{lazyload_url}\"" if options[:lazy_load]
+      html
+    end
+
+    def image_url(file, opts = {})
+      options = {
+        parent_folder: ENV["RACK_ENV"] == "production" ? "" : "/assets/images/"
+      }.merge(opts)
+
+      begin
+        image = File.basename try_image(file)
+      rescue TypeError
+        raise FileNotFoundError.new("#{file} not recognized by Sprockets.")
+      end
 
       if options[:trim_prefixes]
-        image_src = remove_image_prefix(image_src)
         image = remove_image_prefix(image)
       end
 
-      html = "src=\"#{options[:parent_folder]}#{image_src}\" width=\"#{size[0]}\" height=\"#{size[1]}\""
-      html = "#{html} data-lazyload-src=\"#{options[:parent_folder]}#{image}\"" if options[:lazy_load]
-      html
+      yield image if block_given?
+
+      "#{options[:parent_folder]}#{image}"
     end
 
     # Public: Builds a path to a JS file. 
