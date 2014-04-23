@@ -40,7 +40,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  fastimage
+  fastimage (= 1.6.1)
   rakeup
   sinatra
   sprockets

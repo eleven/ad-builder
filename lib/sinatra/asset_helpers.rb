@@ -1,3 +1,5 @@
+require "fastimage"
+
 module Sinatra
   module AssetHelpers
     attr_accessor :banner_type, :banner_size

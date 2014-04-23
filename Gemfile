@@ -4,7 +4,7 @@ gem "sinatra"
 gem "thin"
 gem "rakeup"
 gem "sprockets"
-gem "fastimage"
+gem "fastimage", "1.6.1"
 
 # Asset compression
 gem "yui-compressor"

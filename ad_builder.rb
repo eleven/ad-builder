@@ -1,7 +1,8 @@
+require "rubygems"
+require "bundler/setup"
 require "json"
 require "yaml"
 require "sprockets"
-require "fastimage"
 
 require_relative "lib/ad_builder"
 
