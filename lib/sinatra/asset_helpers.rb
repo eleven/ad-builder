@@ -38,14 +38,14 @@ module Sinatra
 
       img_path = try_image(src)
       img_url = image_url(src, options)
-      img_size = FastImage.size(img_path)
+      # img_size = FastImage.size(img_path)
 
       if options[:lazy_load]
         lazyload_url = img_url
         img_url = image_url("blank.gif", options)
       end
 
-      html = "src=\"#{img_url}\" width=\"#{img_size[0]}\" height=\"#{img_size[1]}\""
+      html = "src=\"#{img_url}\"" # width=\"#{img_size[0]}\" height=\"#{img_size[1]}\""
       html = "#{html} data-lazyload-src=\"#{lazyload_url}\"" if options[:lazy_load]
       html
     end
