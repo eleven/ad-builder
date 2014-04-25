@@ -6,6 +6,7 @@ var gutil = require('gulp-util'),
     plumber = require('gulp-plumber'),
     livereload = require('gulp-livereload'),
     recess = require('gulp-recess'),
+    jshint = require('gulp-jshint'),
     project = argv.p || argv.project;
 
 // =============================================================================
@@ -44,6 +45,7 @@ gulp.task('livereload', projectTask(function () {
 
 gulp.task('lint', projectTask(function () {
   gulp.start('lint-css');
+  gulp.start('lint-js');
 }));
 
 // lint-css
@@ -57,6 +59,21 @@ gulp.task('lint-css', projectTask(function () {
     gulp.src(file.path)
       .pipe(plumber())
       .pipe(recess(recessOpts));
+  });
+}));
+
+// lint-js
+
+gulp.task('lint-js', projectTask(function () {
+  var jshintOpts = {
+    "expr": false
+  };
+
+  gulp.watch('src/' + project + '/**/*.js').on('change', function (file) {
+    gulp.src(file.path)
+      .pipe(plumber())
+      .pipe(jshint())
+      .pipe(jshint.reporter('default'));
   });
 }));
 
@@ -83,11 +100,15 @@ gulp.task('help', function () {
         },
         {
           title: 'gulp lint -p PROJECT_DIR',
-          description: "Runs the lint-css task."
+          description: "Runs the lint-css and lint-js tasks simultaneously."
         },
         {
           title: 'gulp lint-css -p PROJECT_DIR',
           description: "Lints CSS files in a project directory after save with RECESS."
+        },
+        {
+          title: 'gulp lint-js -p PROJECT_DIR',
+          description: "Lints JS files in a project directory after save with JSHint."
         }
       ];
 

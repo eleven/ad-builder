@@ -17,6 +17,7 @@
     "gulp-util": "^2.2.14",
     "gulp-recess": "^0.3.0",
     "recess": "^1.1.9",
-    "gulp-plumber": "^0.6.1"
+    "gulp-plumber": "^0.6.1",
+    "gulp-jshint": "^1.5.5"
   }
 }
