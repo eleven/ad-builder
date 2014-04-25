@@ -4,17 +4,27 @@ Ad Builder helps you make your HTML5 ads, quickly. Do you enjoy managing 30 vari
 
 ## Getting started
 
-Make sure you have all dependencies installed by running:
+To start, you'll need to install all of the dependencies. We're currently using a combination of [Ruby](http://ruby-lang.org) for the back-end and [Node.js](http://nodejs.org) for front-end helpers. Please make sure you have those two packages installed first before diving in.
 
-    bundle
+Once you have both Node and Ruby installed, begin by installing all of dependencies we need to run the server:
+
+    bundle install
+
+Afterwards, install all Node dependencies by running:
+
+    npm install
+
+Finally, you will need to install `gulp` as a global module so that we can use the `gulp` command:
+
+    npm install -g gulp
 
 ### Development
 
-Development consists of using Sinatra and Sprockets for building files. Simply boot up the server by running:
+Development consists of using gulp for file watching and Sinatra and Sprockets for building files. Simply boot up the server and local environment by running:
 
-    ADBUILDER_PROJECT=<project name> rackup
+    gulp watch -p PROJECT_DIR
 
-The `<project name>` would be the your project directory that you'd like to load into the Ad Builder. Since Ad Builder only supports one project at a time, you'll have to reboot your server to switch projects.
+The `PROJECT_DIR` would be the your project directory that you'd like to load into the Ad Builder. A project directory exists in the `src/` folder. Since Ad Builder only supports one project at a time, you'll have to reboot your server to switch projects. You can stop the server at any time by pressing <kbd>Ctrl</kbd> + <kbd>C</kbd>.
 
 ## The src folder
 
@@ -91,26 +101,6 @@ All of the images must be placed into your project's `assets/images` folder. Eac
 
 Ad Builder comes with a handful of Rake tasks by default. If a rake command specified below has an argument prepended with an asterisk, that means that the argument is optional.
 
-### rake new[project_name,*types,*sizes]
-
-Scaffolds a new project in the `src` directory.
-
-Arguments:
-
-* `project_name` - the name of the project. This will be the directory's name.
-* `types` - (optional) a space-delimited string of types to support (e.g. "typeA typeB typeC"). **Default:** no types.
-* `sizes` - (optional) a space-delimited string of sizes in the format `WxH` to create templates for (e.g. "300x250 160x600"). **Default:** no sizes.
-
-#### Example
-
-Running the command:
-
-    $ rake new["my-ads","general alt","300x250 160x600"]
-
-Will scaffold a new project named `my-ads` with the types `general` and `alt` in the sizes of `300x250` and `160x600`. It will create a working project with a manifest, CSS and JS files and templates that include helpers and variables to give you an example of how a project is structured.
-
-If you run `rake new` with only the project name, then _no_ ad templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
-
 ### rake export[project,*types,*sizes,include_index]
 
 Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/<project>/<type>/<size>/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
@@ -141,6 +131,32 @@ Will result in each ad will be placed into a folder named after its project.
             ...
 
 From here, you can easily hand off your exported ads.
+
+### rake new[project_name,*types,*sizes]
+
+* * *
+
+_**Note:** This task hasn't been implemented yet._
+
+* * *
+
+Scaffolds a new project in the `src` directory.
+
+Arguments:
+
+* `project_name` - the name of the project. This will be the directory's name.
+* `types` - (optional) a space-delimited string of types to support (e.g. "typeA typeB typeC"). **Default:** no types.
+* `sizes` - (optional) a space-delimited string of sizes in the format `WxH` to create templates for (e.g. "300x250 160x600"). **Default:** no sizes.
+
+#### Example
+
+Running the command:
+
+    $ rake new["my-ads","general alt","300x250 160x600"]
+
+Will scaffold a new project named `my-ads` with the types `general` and `alt` in the sizes of `300x250` and `160x600`. It will create a working project with a manifest, CSS and JS files and templates that include helpers and variables to give you an example of how a project is structured.
+
+If you run `rake new` with only the project name, then _no_ ad templates, css and etc will be created. Just the bare-minimum folder structure and a `manifest.yml` file.
 
 [asset-helpers]: https://github.com/eleven/ad-builder/blob/master/lib/asset_helpers.rb
 [sprockets-homepage]: https://github.com/sstephenson/sprockets

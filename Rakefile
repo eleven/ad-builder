@@ -25,7 +25,7 @@ task :serve, [:project] do |t, args|
   Rake::Task["server"].invoke
 end
 
-desc "Exports a project's ad(s) into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake build[\"project-name\",\"general discovery\", \"300x600 728x90\"]"
+desc "Exports a project's ad(s) into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake export[\"project-name\",\"general discovery\", \"300x600 728x90\"]"
 task :export, [:project, :types, :sizes, :include_indexes] do |t, args|
   args.with_defaults types: nil, sizes: nil, include_indexes: true
 
