@@ -26,11 +26,7 @@ Development consists of using gulp for file watching and Sinatra and Sprockets f
 
 The `PROJECT_DIR` would be the your project directory that you'd like to load into the Ad Builder. A project directory exists in the `src/` folder. Since Ad Builder only supports one project at a time, you'll have to reboot your server to switch projects. You can stop the server at any time by pressing <kbd>Ctrl</kbd> + <kbd>C</kbd>.
 
-* * *
-
-_**Protip:** If you need help with running the `gulp` tasks, try running `gulp help`._
-
-* * *
+> **Protip:** If you need help with running the `gulp` tasks, try running `gulp help`.
 
 ## The src folder
 
@@ -140,11 +136,7 @@ From here, you can easily hand off your exported ads.
 
 ### rake new[project_name,*types,*sizes]
 
-* * *
-
-_**Note:** This task hasn't been implemented yet._
-
-* * *
+> **Important!** This task hasn't been implemented yet.
 
 Scaffolds a new project in the `src` directory.
 
