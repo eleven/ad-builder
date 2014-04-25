@@ -26,6 +26,12 @@ Development consists of using gulp for file watching and Sinatra and Sprockets f
 
 The `PROJECT_DIR` would be the your project directory that you'd like to load into the Ad Builder. A project directory exists in the `src/` folder. Since Ad Builder only supports one project at a time, you'll have to reboot your server to switch projects. You can stop the server at any time by pressing <kbd>Ctrl</kbd> + <kbd>C</kbd>.
 
+* * *
+
+_**Protip:** If you need help with running the `gulp` tasks, try running `gulp help`._
+
+* * *
+
 ## The src folder
 
 All development happens within the `src` folder, which isn't tracked by this git repo. Ad Builder assumes a lot of things in your `src` folder:
