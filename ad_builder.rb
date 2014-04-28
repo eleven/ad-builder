@@ -2,7 +2,10 @@ require "rubygems"
 require "bundler/setup"
 require "json"
 require "yaml"
+require "compass"
+require "sass"
 require "sprockets"
+require "sprockets-sass"
 
 require_relative "lib/ad_builder"
 
@@ -10,6 +13,7 @@ class AdBuilderServer < AdBuilder::Server
   set :project, ENV["ADBUILDER_PROJECT"]
   set :root, File.join(File.dirname(__FILE__), "src", project)
   set :core_assets, File.join(File.dirname(__FILE__), "lib", "ad_builder", "assets")
+  set :precompile, [/\w+\.(?!js|css).+/]
 
   set :views, [File.join(root), File.join(File.dirname(__FILE__), "lib", "sinatra", "views")]
   set :sprockets, (Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) })
@@ -48,7 +52,7 @@ class AdBuilderServer < AdBuilder::Server
 
   get "/assets/css/:stylesheet" do
     content_type "text/css"
-    settings.sprockets["#{params[:stylesheet]}"]
+    try_css params[:stylesheet]
   end
 
   get "/assets/js/:javascript" do

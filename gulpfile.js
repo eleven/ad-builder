@@ -26,7 +26,7 @@ gulp.task('serve', projectTask(function () {
   gutil.log('Booting up the server for ' + gutil.colors.magenta(project));
 
   exec('rake serve[' + project + ']', function (err, stdout, stderr) {
-    gutil.log(gutil.colors.yellow('[jekyll]') + ' ' + stdout);
+    gutil.log(gutil.colors.yellow('[server]') + ' ' + stdout);
   });
 
   gutil.log('Server listening at ' + gutil.colors.magenta('http://0.0.0.0:9292') + '. Press Ctrl + C to stop listening.');

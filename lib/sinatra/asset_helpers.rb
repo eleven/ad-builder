@@ -145,6 +145,20 @@ module Sinatra
 
       file
     end
+
+    def try_css(css)
+      file = css
+
+      ["#{css}.scss", css].each do |filename|
+        file = settings.sprockets[filename]
+        unless file.nil?
+          pathname = file.pathname
+          break if File.exists? pathname
+        end
+      end
+
+      file
+    end
   end
 
   helpers AssetHelpers
