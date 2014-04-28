@@ -146,6 +146,13 @@ module Sinatra
       file
     end
 
+    # Private: Loads either the scss or css version of the file depending on
+    # what's available. It tries to load the file in this order:
+    # 
+    # 1. filename.css.scss
+    # 2. filename.css
+    # 
+    # Returns the file referenced in sprockets.
     def try_css(css)
       file = css
 
