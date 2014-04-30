@@ -71,6 +71,15 @@ module AdBuilder
       puts "http://localhost:9292/api/images/#{type}/#{size}.json"
       images = JSON.load(open("http://localhost:9292/api/images/#{type}/#{size}.json"))["images"]
       images.map! { |image| "#{@src_folder}/#{project}/assets/images/#{image}" }
+
+      # Also, get any files that happen to be specific to that banner: TYPE_SIZE_name.ext
+      Dir.glob("#{@src_folder}/#{project}/assets/images/#{type}_#{size}_*").each do |image|
+        images.push image
+      end
+
+      # Resolve any duplicates
+      images.uniq!
+
       images.each do |image|
         trimmed_image_filename = remove_image_prefix File.basename(image)
         `cp #{image} #{banner_folder}/#{trimmed_image_filename}`

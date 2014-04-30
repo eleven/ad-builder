@@ -105,7 +105,7 @@ Ad Builder comes with a handful of Rake tasks by default. If a rake command spec
 
 ### rake export[project,*types,*sizes,include_index]
 
-Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/<project>/<type>/<size>/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified.
+Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/<project>/<type>/<size>/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified. Do note that only the images that were used on the ad via the `image_src` and `image_url` helpers, along with any images with type and size specific file names (e.g. `general_300x250_imagename.jpg`) will be included.
 
 Arguments:
 
