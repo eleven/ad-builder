@@ -25,7 +25,7 @@ gulp.task('watch', projectTask(function () {
 gulp.task('serve', projectTask(function () {
   gutil.log('Booting up the server for ' + gutil.colors.magenta(project));
 
-  exec('rake serve[' + project + ']', function (err, stdout, stderr) {
+  exec('bundle exec rake serve[' + project + ']', function (err, stdout, stderr) {
     gutil.log(gutil.colors.yellow('[server]') + ' ' + stdout);
   });
 
