@@ -62,7 +62,7 @@ class AdBuilderServer < AdBuilder::Server
 
   %w{jpg png gif}.each do |format|
     get "/assets/images/:image.#{format}" do
-      content_type "image/#{format}"
+      content_type "image/#{format == 'jpg' ? 'jpeg' : format}"
       settings.sprockets["#{params[:image]}.#{format}"]
     end
   end
