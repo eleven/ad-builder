@@ -4,8 +4,8 @@ gem "sinatra"
 gem "thin"
 gem "rakeup"
 
-gem "sass", "3.2.19"
-gem "compass", "0.12.6"
+gem "sass", ">= 3.3"
+gem "compass", github: "chriseppstein/compass"
 gem "sprockets"
 gem "sprockets-sass"
 
