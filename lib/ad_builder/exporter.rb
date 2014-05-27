@@ -16,10 +16,10 @@ module AdBuilder
       @src_folder = src_folder
       @dist_folder = dist_folder
       @server = server
-      @options = options.merge include_indexes: true, verbose: false
+      @options = { include_indexes: true, verbose: false, compress_assets: true }.merge options
     end
 
-    def export_project(project, types, sizes)
+    def export_project(project, types = nil, sizes = nil)
       export_banners project, types, sizes
     end
 
@@ -90,8 +90,13 @@ module AdBuilder
 
     def compile_asset(src, destination)
       sprockets = @server.settings.sprockets
-      sprockets.css_compressor = YUI::CssCompressor.new
-      sprockets.js_compressor = Uglifier.new mangle: true, comments: :none
+
+      if @options[:compress_assets]
+        sprockets.css_compressor = YUI::CssCompressor.new
+        sprockets.js_compressor = Uglifier.new mangle: true, comments: :none
+      else
+        sprockets.css_compressor = YUI::CssCompressor.new line_break: 0
+      end
 
       asset = sprockets[src]
       FileUtils.mkdir_p Pathname.new(destination).dirname

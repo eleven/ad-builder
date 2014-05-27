@@ -26,8 +26,8 @@ task :serve, [:project] do |t, args|
 end
 
 desc "Exports a project's ad(s) into the dist/ folder.\n\nProtip: use space-delimeted string(s) for multiple types/sizes. Example:\n  rake export[\"project-name\",\"general discovery\", \"300x600 728x90\"]"
-task :export, [:project, :types, :sizes, :include_indexes] do |t, args|
-  args.with_defaults types: nil, sizes: nil, include_indexes: true
+task :export, [:project, :compress_assets, :include_indexes] do |t, args|
+  args.with_defaults compress_assets: "true", include_indexes: "true"
 
   Rake::Task["cleanup"].invoke
 
@@ -41,8 +41,8 @@ task :export, [:project, :types, :sizes, :include_indexes] do |t, args|
   sleep 1
 
   begin
-    exporter = AdBuilder::Exporter.new src_folder, dist_folder, AdBuilderServer, include_indexes: args.include_indexes, verbose: verbose
-    exporter.export_project args.project, rake_array_arg(args.types), rake_array_arg(args.sizes)
+    exporter = AdBuilder::Exporter.new src_folder, dist_folder, AdBuilderServer, include_indexes: args.include_indexes == "true", verbose: verbose, compress_assets: args.compress_assets == "true"
+    exporter.export_project args.project
   rescue Exception => e
     puts e.message
     puts e.backtrace

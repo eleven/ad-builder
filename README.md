@@ -103,15 +103,15 @@ All of the images must be placed into your project's `assets/images` folder. Eac
 
 Ad Builder comes with a handful of Rake tasks by default. If a rake command specified below has an argument prepended with an asterisk, that means that the argument is optional.
 
-### rake export[project,*types,*sizes,include_index]
+### rake export[project,*compress_assets,*include_indexes]
 
 Exports ads into the `dist/` folder. Each ad will be placed into a directory following this pattern: `dist/<project>/<type>/<size>/'. Each ad's assets will be placed into the ad directory. The images will have their prefixes removed and CSS and JS files will be concatenated and minified. Do note that only the images that were used on the ad via the `image_src` and `image_url` helpers, along with any images with type and size specific file names (e.g. `general_300x250_imagename.jpg`) will be included.
 
 Arguments:
 
 * `project` - The project you'd like to export ads for (e.g. "my-ads").
-* `types` - (optional) A space-delimited string of types to export (e.g. "typeA typeB typeC"). **Default:** all of a project's types.
-* `sizes` - (optional) A space-delimited string of sizes to export (e.g. "160x600 300x250"). **Default:** all of a project's sizes.
+* `compress_assets` - (optional) A boolean value that determines if the assets should be compressed or not. **Default:** true.
+* `include_indexes` - (optional) A boolean value that determines if the index pages should be included. **Default:** true.
 
 #### Example
 
