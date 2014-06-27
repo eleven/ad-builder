@@ -20,6 +20,8 @@ class AdBuilderServer < AdBuilder::Server
 
   set :manifest, lambda { YAML.load_file File.join(root, 'manifest.yml') }
 
+  set :protection, :except => :frame_options
+
   configure do
     # Load in global assets
     Dir["#{core_assets}/*/"].each do |core_asset_dir|
